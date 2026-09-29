@@ -15,6 +15,8 @@ ENV TERM=xterm
 ENV COLUMNS=240
 ENV LINES=60
 
+# media-types provides /etc/mime.types, which Python's mimetypes module reads
+# (the native runner image gets it through its GUI and service packages).
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
         build-essential \
@@ -24,6 +26,7 @@ RUN apt-get update \
         procps \
         util-linux \
         docker-cli \
+        media-types \
  && (apt-get install -y --no-install-recommends docker-compose-plugin \
         || apt-get install -y --no-install-recommends docker-compose-v2 \
         || apt-get install -y --no-install-recommends docker-compose) \
@@ -63,6 +66,8 @@ ENV TERM=xterm
 ENV COLUMNS=240
 ENV LINES=60
 
+# media-types provides /etc/mime.types, which Python's mimetypes module reads
+# (the native runner image gets it through its GUI and service packages).
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
         build-essential \
@@ -75,6 +80,7 @@ RUN apt-get update \
         pkg-config \
         libssl-dev \
         sqlite3 \
+        media-types \
  && (apt-get install -y --no-install-recommends docker-compose-plugin \
         || apt-get install -y --no-install-recommends docker-compose-v2 \
         || apt-get install -y --no-install-recommends docker-compose) \
@@ -99,6 +105,11 @@ RUN mkdir -p "$NVM_DIR" \
  && ln -sf "$NODE_BIN_DIR/node" /usr/local/bin/node \
  && ln -sf "$NODE_BIN_DIR/npm" /usr/local/bin/npm \
  && ln -sf "$NODE_BIN_DIR/npx" /usr/local/bin/npx
+# test_translator's reference runs TypeScript testers with
+# `npx ts-node --esm`. Unpinned, npx resolves npm-latest TypeScript, which
+# ts-node 10.9 cannot load in ESM mode ("reading 'fileExists'"). Pin a
+# known-good pair so the TypeScript cases are graded reproducibly.
+RUN . "$NVM_DIR/nvm.sh" && npm install -g typescript@5.5.4 ts-node@10.9.2
 ENV PATH="$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH"
 
 ENV CARGO_HOME=$HOME/.cargo
