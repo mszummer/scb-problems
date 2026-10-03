@@ -1,0 +1,21 @@
+{
+  "services": [
+    { "name": "requests", "primitive": "queue" },
+    { "name": "state", "primitive": "ape" },
+    { "name": "index", "primitive": "store" }
+  ],
+  "applications": [{
+    "name": "auction_house",
+    "artifact_key": "apps/auction_house@v1",
+    "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "bindings": [
+      { "handle": "requests", "kind": "queue", "service": "requests" },
+      { "handle": "state", "kind": "ape", "service": "state" },
+      { "handle": "index", "kind": "store", "service": "index" }
+    ],
+    "routes": [
+      { "prefix": "/", "binding": "requests", "kind": "api" }
+    ],
+    "compute": { "memory_mb": 256, "cpu_percent": 50 }
+  }]
+}
